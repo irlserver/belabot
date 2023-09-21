@@ -35,6 +35,7 @@ jobs:
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
           bin: belabot
+          target: ${{ matrix.target }}
           tar: unix
           zip: windows
         env:
