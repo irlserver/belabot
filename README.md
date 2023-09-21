@@ -4,7 +4,7 @@ A chat bot alternative to control [belaUI](https://github.com/BELABOX/belaUI) in
 
 ## How do i run this?
 
-Just download the latest binary from [releases](https://github.com/715209/belabot/releases) and execute it.
+Just download the latest binary from [releases](https://github.com/IRLServer/belabot/releases) and execute it.
 
 ## Config
 
@@ -73,6 +73,7 @@ Example of the config that will be automatically generated upon running the bina
 
 ```JSON
 "belabox": {
+    "remote_url": "wss://remote.belabox.net/ws/remote",
     "remote_key": "key",
     "custom_interface_name": {
         "eth0": "Something",
@@ -144,4 +145,7 @@ After running the executable successfully you can use the following commands in 
 
 ## Disclaimer
 
-This is a third party tool, please do not ask for help on the BELABOX discord server. Instead, join the [NOALBS Community Server](https://discord.gg/efWu5HWM2u) for all your questions.
+This is a third party tool, please do not ask for help on the BELABOX or NOALBS discord server. Instead, join the [IRLServer discord](https://irlserver.com/discord) for all your questions.
+
+Thanks to [NOALBS](https://discord.gg/efWu5HWM2u) for the original code. I am hoping to contribute to the Belabox and open-source community in any way i can.
+Please use official services when possible.

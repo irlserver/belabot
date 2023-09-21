@@ -25,6 +25,7 @@ pub struct Settings {
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(default)]
 pub struct Belabox {
+    pub remote_url: String,
     pub remote_key: String,
     pub custom_interface_name: HashMap<String, String>,
     pub monitor: Monitor,
@@ -120,13 +121,20 @@ impl Settings {
     pub async fn ask_for_settings() -> Result<Self, ConfigError> {
         println!("Please paste your BELABOX Cloud remote URL below");
 
-        let remote_key: String = input()
+        let remote: String = input()
             .msg("URL: ")
+            .add_err_test(|u: &String| !u.is_empty(), "No url found, please try again")
             .add_err_test(
                 |u: &String| u.contains("?key="),
                 "No key found, please try again",
             )
-            .get()
+            .get();
+        let remote_url: String = remote
+            .split("?key=")
+            .nth(0)
+            .expect("No URL found")
+            .to_string();
+        let remote_key: String = remote
             .split("?key=")
             .nth(1)
             .expect("No key found")
@@ -177,6 +185,7 @@ impl Settings {
         }
 
         let belabox = Belabox {
+            remote_url,
             remote_key,
             custom_interface_name,
             monitor,

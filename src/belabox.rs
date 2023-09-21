@@ -57,13 +57,24 @@ struct InnerMessage {
 }
 
 impl Belabox {
-    pub async fn connect(key: String) -> Result<Self, BelaboxError> {
+    pub async fn connect(url: String, key: String) -> Result<Self, BelaboxError> {
         let (inner_tx, inner_rx) = mpsc::unbounded_channel();
         let (message_tx, _) = broadcast::channel(100);
         let message_tx = Arc::new(message_tx);
 
+        let url = if url.is_empty() {
+            BELABOX_WS.to_string()
+        } else {
+            url
+        };
+
         let auth = requests::Remote::AuthKey { key, version: 6 };
-        let run_handle = tokio::spawn(run_loop(auth, message_tx.clone(), inner_rx));
+        if is_belabox_cloud(url.clone()).await {
+            info!("Connecting to BELABOX Cloud");
+        } else {
+            info!("Connecting to {}", url);
+        }
+        let run_handle = tokio::spawn(run_loop(url, auth, message_tx.clone(), inner_rx));
 
         Ok(Self {
             run_handle,
@@ -133,7 +144,12 @@ impl Belabox {
     }
 }
 
+async fn is_belabox_cloud(url: String) -> bool {
+    url.contains(BELABOX_WS)
+}
+
 async fn run_loop(
+    url: String,
     auth: requests::Remote,
     message_tx: Arc<broadcast::Sender<Message>>,
     inner_rx: mpsc::UnboundedReceiver<InnerMessage>,
@@ -143,7 +159,7 @@ async fn run_loop(
     tokio::spawn(handle_requests(inner_rx, request_write.clone()));
 
     loop {
-        let ws_stream = get_connection().await;
+        let ws_stream = get_connection(url.clone()).await;
         let (mut write, read) = ws_stream.split();
 
         // Authenticate
@@ -175,13 +191,13 @@ async fn run_loop(
     }
 }
 
-async fn get_connection() -> WebSocketStream<MaybeTlsStream<TcpStream>> {
+async fn get_connection(url: String) -> WebSocketStream<MaybeTlsStream<TcpStream>> {
     let mut retry_grow = 1;
 
     loop {
         info!("Connecting");
 
-        if let Ok((ws_stream, _)) = tokio_tungstenite::connect_async(BELABOX_WS).await {
+        if let Ok((ws_stream, _)) = tokio_tungstenite::connect_async(url.clone()).await {
             info!("Connected");
             break ws_stream;
         }

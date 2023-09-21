@@ -42,7 +42,13 @@ pub struct BelaState {
 impl Bot {
     pub async fn new(config: Settings) -> Result<Self, Error> {
         let twitch = Arc::new(Twitch::run(config.twitch.clone()).await?);
-        let belabox = Arc::new(Belabox::connect(config.belabox.remote_key.to_owned()).await?);
+        let belabox = Arc::new(
+            Belabox::connect(
+                config.belabox.remote_url,
+                config.belabox.remote_key.to_owned(),
+            )
+            .await?,
+        );
 
         // Create state to store BELABOX information
         let bela_state = Arc::new(RwLock::new(BelaState::default()));

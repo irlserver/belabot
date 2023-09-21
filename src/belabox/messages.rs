@@ -41,6 +41,7 @@ pub struct RemoteEncoder {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct Config {
     pub password_hash: String,
+    pub remote_url: String,
     pub remote_key: String,
     pub max_br: u32,
     pub delay: i32,
