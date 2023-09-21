@@ -40,7 +40,7 @@ jobs:
           target: ${{ matrix.target }}
           tar: unix
           zip: windows
-          features: vendored-openssl
+          features: vendored
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_PROFILE_RELEASE_LTO: true
